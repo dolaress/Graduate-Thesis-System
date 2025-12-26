@@ -14,7 +14,7 @@ app.config.from_object(Config)
 # Init extensions
 db.init_app(app)
 jwt.init_app(app)
-cors.init_app(app)
+cors.init_app(app, resources={r"/api/*": {"origins": "*"}})
 
 # Register Blueprints
 app.register_blueprint(main_bp)

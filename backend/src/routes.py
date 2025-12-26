@@ -24,7 +24,7 @@ def login():
         if user and user.password == password:
             # Note: In production, password should be hashed (e.g. bcrypt). 
             # Current implementation uses plain text as per user SQL update.
-            access_token = create_access_token(identity=user.id)
+            access_token = create_access_token(identity=str(user.id))
             return jsonify({
                 'access_token': access_token,
                 'user': {
@@ -71,7 +71,7 @@ def register():
         db.session.commit()
 
         # Auto-login
-        access_token = create_access_token(identity=new_user.id)
+        access_token = create_access_token(identity=str(new_user.id))
         return jsonify({
             'message': 'User created successfully',
             'access_token': access_token,
@@ -91,6 +91,7 @@ def register():
 
 @main_bp.route('/api/metadata', methods=['GET'])
 def get_metadata():
+    # --- Query Data ---
     universities = University.query.all()
     institutes = Institute.query.all()
     types = ThesisType.query.all()
@@ -106,6 +107,70 @@ def get_metadata():
         'subjects': [{'id': s.id, 'name': s.name} for s in subjects],
         'keywords': [{'id': k.id, 'text': k.text} for k in keywords]
     })
+
+@main_bp.route('/api/theses', methods=['POST'])
+@jwt_required()
+def create_thesis():
+    current_user_id = int(get_jwt_identity())
+    data = request.get_json()
+    
+    # Required Fields
+    title = data.get('title', '').strip()
+    abstract = data.get('abstract', '').strip()
+    year = data.get('year')
+    page_count = data.get('page_count')
+    type_id = data.get('type_id')
+    language_code = data.get('language_code')
+    institute_id = data.get('institute_id')
+    subject_id = data.get('subject_id') # Single ID from dropdown
+    keywords_str = data.get('keywords', '') # "AI, Data"
+    
+    if not title or not abstract or not year or not type_id or not institute_id:
+        return jsonify({'error': 'Missing required fields (title, abstract, year, type, institute)'}), 400
+
+    try:
+        # Create Thesis
+        new_thesis = Thesis(
+            title=title,
+            abstract=abstract,
+            year=int(year),
+            page_count=int(page_count) if page_count else None,
+            type_id=int(type_id),
+            language_code=language_code,
+            institute_id=int(institute_id),
+            author_id=current_user_id,
+            submission_date=db.func.current_date() # Or use datetime.date.today()
+        )
+        
+        # Handle Subject (Many-to-Many but getting single ID from simple dropdown)
+        if subject_id:
+            subject = Subject.query.get(subject_id)
+            if subject:
+                new_thesis.subjects.append(subject)
+        
+        # Handle Keywords
+        if keywords_str:
+            keyword_list = [k.strip() for k in keywords_str.split(',') if k.strip()]
+            for k_text in keyword_list:
+                # Check if exists (case-insensitive search ideally, but schema is simple)
+                # Using ilike for better matching or just filter_by text
+                keyword = Keyword.query.filter(Keyword.text.ilike(k_text)).first()
+                if not keyword:
+                    keyword = Keyword(text=k_text)
+                    db.session.add(keyword) # Add to session to get ID after commit? 
+                    # Actually valid to append new object to relationship
+                
+                if keyword not in new_thesis.keywords:
+                    new_thesis.keywords.append(keyword)
+
+        db.session.add(new_thesis)
+        db.session.commit()
+        
+        return jsonify({'message': 'Thesis submitted successfully', 'id': new_thesis.id}), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Failed to suggest thesis: {str(e)}'}), 500
 
 @main_bp.route('/api/theses', methods=['GET'])
 def get_theses():
@@ -182,7 +247,7 @@ def get_theses():
 @main_bp.route('/api/my-theses', methods=['GET'])
 @jwt_required()
 def get_my_theses():
-    current_user_id = get_jwt_identity()
+    current_user_id = int(get_jwt_identity())
     theses = Thesis.query.filter_by(author_id=current_user_id).all()
     
     results = []
@@ -204,3 +269,32 @@ def get_my_theses():
             'keywords': [k.id for k in t.keywords]
         })
     return jsonify(results)
+
+@main_bp.route('/api/theses/<int:thesis_id>', methods=['DELETE'])
+@jwt_required()
+def delete_thesis(thesis_id):
+    current_user_id = int(get_jwt_identity())
+    
+    thesis = Thesis.query.get(thesis_id)
+    if not thesis:
+        return jsonify({'error': 'Thesis not found'}), 404
+    
+    # Only allow deletion if the current user is the author
+    if thesis.author_id != current_user_id:
+        return jsonify({'error': 'Unauthorized: You can only delete your own theses'}), 403
+    
+    try:
+        # Remove relationships first (many-to-many)
+        thesis.subjects.clear()
+        thesis.keywords.clear()
+        
+        # Delete supervisor associations
+        SupervisorThesis.query.filter_by(thesis_id=thesis_id).delete()
+        
+        db.session.delete(thesis)
+        db.session.commit()
+        
+        return jsonify({'message': 'Thesis deleted successfully'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Failed to delete thesis: {str(e)}'}), 500

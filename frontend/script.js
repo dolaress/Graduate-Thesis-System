@@ -1,5 +1,6 @@
 // --- Configuration ---
-const API_URL = 'http://localhost:5000/api';
+// --- Configuration ---
+const API_URL = 'http://127.0.0.1:5000/api';
 
 // --- State Management ---
 let state = {
@@ -34,11 +35,14 @@ async function initApp() {
         const res = await fetch(`${API_URL}/metadata`);
         if (res.ok) {
             state.metadata = await res.json();
+            console.log('Metadata loaded:', state.metadata);
         } else {
-            console.error('Failed to load metadata');
+            console.error('Failed to load metadata:', res.status);
+            alert('Fatal Error: Could not load system data. Backend might be down.');
         }
     } catch (e) {
         console.error('API Error:', e);
+        alert('Fatal Error: Could not connect to the Backend Server. Please ensure it is running on port 5000.');
     }
 
     render();
@@ -50,12 +54,11 @@ initApp();
 
 // --- State Management ---
 
-// --- REPLACED BY STATE OBJECT ABOVE ---
+
 
 // --- Helper Functions ---
 
-// function getAuthorName(id) { ... } // Replaced by direct property access from API response for theses
-// function getAuthorName(id) { return 'Unknown'; } // Deprecated: Use thesis.author string from API
+
 
 
 function getTypeName(id) {
@@ -85,8 +88,8 @@ function getUniversityName(instituteId) {
 const appContainer = document.getElementById('app');
 
 // --- Canvas Animation Logic ---
-let animationId;
-let canvasState = 'none'; // 'particles', 'dots', 'none'
+var animationId;
+var canvasState = 'none'; // 'particles', 'dots', 'none'
 
 function initCanvas() {
     const canvas = document.getElementById('bg-canvas');
@@ -502,10 +505,7 @@ function renderLogin() {
     });
 }
 
-// Init
-// Init handled by initApp()
-// initCanvas();
-// render();
+
 
 function renderHeader() {
     // This function updates the header area outside the appContainer if needed, 
@@ -881,6 +881,14 @@ async function renderMyTheses() {
                           Assuming I updated app.py logic logic below to return standard response. -->
                      <span class="badge type">${t.type_id ? getTypeName(t.type_id) : 'Thesis'}</span>
                      <span class="badge lang">${t.language_code || 'TR'}</span>
+                     <button class="btn-delete-thesis" onclick="deleteMyThesis(${t.id}, event)" title="Delete Thesis">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                             <polyline points="3 6 5 6 21 6"></polyline>
+                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                             <line x1="10" y1="11" x2="10" y2="17"></line>
+                             <line x1="14" y1="11" x2="14" y2="17"></line>
+                         </svg>
+                     </button>
                 </div>
                 <h3 onclick="switchView('detail-${t.id}')">${t.title}</h3>
                 <p class="author">by Me</p>
@@ -948,7 +956,45 @@ function renderSupervisorPanel() {
     });
 }
 
-// Global delete function
+// Global delete function for My Theses page
+window.deleteMyThesis = async (id, event) => {
+    event.stopPropagation(); // Prevent card click
+    
+    if (!confirm('Are you sure you want to delete this thesis? This action cannot be undone.')) {
+        return;
+    }
+    
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+        alert('You must be logged in to delete a thesis.');
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API_URL}/theses/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (res.ok) {
+            // Remove from local cache
+            const index = state.theses.findIndex(t => t.id === id);
+            if (index > -1) {
+                state.theses.splice(index, 1);
+            }
+            alert('Thesis deleted successfully!');
+            render(); // Re-render the entire view to avoid duplicates
+        } else {
+            const err = await res.json();
+            alert(err.error || 'Failed to delete thesis');
+        }
+    } catch (error) {
+        console.error('Delete error:', error);
+        alert('An error occurred while deleting the thesis.');
+    }
+};
+
+// Global delete function for Supervisor Panel (legacy)
 window.deleteThesis = (id) => {
     if (confirm('Are you sure you want to delete this thesis? This action cannot be undone.')) {
         const index = state.theses.findIndex(t => t.id === id);
@@ -961,6 +1007,14 @@ window.deleteThesis = (id) => {
 };
 
 function renderSubmit() {
+    console.log('RENDER SUBMIT DATA:', state.metadata);
+
+    // Fail-Safe Data Extraction
+    const types = state.metadata.thesisTypes || [];
+    const langs = state.metadata.languages || [];
+    const insts = state.metadata.institutes || [];
+    const subjs = state.metadata.subjects || [];
+
     const section = document.createElement('section');
     section.className = 'submit-section fade-in';
     section.innerHTML = `
@@ -988,20 +1042,29 @@ function renderSubmit() {
                  <div class="form-group">
                     <label>Type</label>
                     <select id="sub-type">
-                        ${state.metadata.thesisTypes.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
+                        <option value="" disabled selected>Select...</option>
+                        ${types.length > 0 
+                            ? types.map(t => `<option value="${t.id}">${t.name}</option>`).join('') 
+                            : '<option disabled>No data found (Check Console)</option>'}
                     </select>
                 </div>
                 <div class="form-group">
                     <label>Language</label>
                     <select id="sub-lang">
-                         ${state.metadata.languages.map(l => `<option value="${l.code}">${l.name}</option>`).join('')}
+                        <option value="" disabled selected>Select...</option>
+                        ${langs.length > 0 
+                            ? langs.map(l => `<option value="${l.code}">${l.name}</option>`).join('') 
+                            : '<option disabled>No data found (Check Console)</option>'}
                     </select>
                 </div>
             </div>
             <div class="form-group full">
                 <label>Institute</label>
                 <select id="sub-inst">
-                     ${state.metadata.institutes.map(i => `<option value="${i.id}">${i.name} (${getUniversityName(i.id)})</option>`).join('')}
+                     <option value="" disabled selected>Select...</option>
+                     ${insts.length > 0 
+                        ? insts.map(i => `<option value="${i.id}">${i.name}</option>`).join('') 
+                        : '<option disabled>No data found (Check Console)</option>'}
                 </select>
             </div>
             
@@ -1009,7 +1072,10 @@ function renderSubmit() {
                  <div class="form-group">
                     <label>Subject</label>
                     <select id="sub-subject">
-                        ${state.metadata.subjects.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
+                        <option value="" disabled selected>Select...</option>
+                        ${subjs.length > 0 
+                            ? subjs.map(s => `<option value="${s.id}">${s.name}</option>`).join('') 
+                            : '<option disabled>No data found (Check Console)</option>'}
                     </select>
                 </div>
                 <div class="form-group" style="flex:2;"> <!-- Give keywords more space -->
@@ -1023,10 +1089,58 @@ function renderSubmit() {
     `;
     appContainer.appendChild(section);
 
-    document.getElementById('submit-form').addEventListener('submit', (e) => {
+    document.getElementById('submit-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        alert("Submission Mock: Backend Submission not implemented in this refactor phase.");
-        switchView('search');
+        
+        // Capture Data
+        const title = document.getElementById('sub-title').value.trim();
+        const abstract = document.getElementById('sub-abstract').value.trim();
+        const year = document.getElementById('sub-year').value;
+        const pageCount = document.getElementById('sub-pages').value;
+        const typeId = document.getElementById('sub-type').value;
+        const languageCode = document.getElementById('sub-lang').value;
+        const instituteId = document.getElementById('sub-inst').value;
+        const subjectId = document.getElementById('sub-subject').value;
+        const keywords = document.getElementById('sub-keywords').value.trim();
+
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            alert('You must be logged in to submit a thesis.');
+            return;
+        }
+
+        try {
+            const res = await fetch(`${API_URL}/theses`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    title: title,
+                    abstract: abstract,
+                    year: year,
+                    page_count: pageCount,
+                    type_id: typeId,
+                    language_code: languageCode,
+                    institute_id: instituteId,
+                    subject_id: subjectId,
+                    keywords: keywords
+                })
+            });
+
+            if (res.ok) {
+                alert("Thesis submitted!");
+                document.getElementById('submit-form').reset();
+                switchView('search');
+            } else {
+                const err = await res.json();
+                alert(err.error || 'Submission failed');
+            }
+        } catch (error) {
+            console.error('Submission error:', error);
+            alert('An error occurred while submitting the thesis.');
+        }
     });
 }
 
