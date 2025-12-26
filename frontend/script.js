@@ -1,199 +1,82 @@
-// --- Mock Data ---
+// --- Configuration ---
+const API_URL = 'http://localhost:5000/api';
 
-const users = [
-    { id: 1, first_name: 'Volkan', last_name: 'Tunalı', role_id: 1, email: 'volkan.tunali@gmail.com' },
-    { id: 2, first_name: 'Mehmet', last_name: 'Şenadlı', role_id: 2, email: 'mehmet.senadli@gmail.com' },
-    { id: 3, first_name: 'Necati', last_name: 'Dolar', role_id: 2, email: 'necati.dolar@gmail.com' },
-    { id: 4, first_name: 'Bülent Bora', last_name: 'Balcı', role_id: 3, email: 'bulent.balci@gmail.com' },
-    { id: 5, first_name: 'Ebru', last_name: 'Yıldız', role_id: 3, email: 'ebru.yildiz@gmail.com' },
-    { id: 6, first_name: 'Hüseyin', last_name: 'Yapıcı', role_id: 3, email: 'huseyin.yapici@gmail.com' },
-    { id: 7, first_name: 'Ali', last_name: 'Kılıç', role_id: 3, email: 'ali.kilic@gmail.com' }
-];
-
-const roles = [
-    { id: 1, name: 'Author' },
-    { id: 2, name: 'Admin' },
-    { id: 3, name: 'Supervisor' }
-];
-
-const universities = [
-    { id: 1, name: 'Maltepe University' },
-    { id: 2, name: 'Marmara University' },
-    { id: 3, name: 'Istanbul University' },
-    { id: 4, name: 'Hacettepe University' },
-    { id: 5, name: 'Ege University' },
-    { id: 6, name: 'Anadolu University' }
-];
-
-const institutes = [
-    { id: 1, name: 'Faculty of Natural Sciences and Engineering', university_id: 1 },
-    { id: 2, name: 'Faculty of Natural Sciences and Engineering', university_id: 2 },
-    { id: 3, name: 'Faculty of Natural Sciences and Engineering', university_id: 5 },
-    { id: 4, name: 'Institute of Science', university_id: 1 },
-    { id: 5, name: 'Institute of Educational Sciences', university_id: 3 },
-    { id: 6, name: 'Graduate School of Engineering', university_id: 4 },
-    { id: 7, name: 'Institute of Social Sciences', university_id: 2 }
-];
-
-const thesisTypes = [
-    { id: 1, name: 'Master' },
-    { id: 2, name: 'Doctorate' },
-    { id: 3, name: 'Specialization in Medicine' },
-    { id: 4, name: 'Proficiency in Art' }
-];
-
-const languages = [
-    { code: 'TR', name: 'Turkish' },
-    { code: 'EN', name: 'English' },
-    { code: 'FR', name: 'French' },
-    { code: 'DE', name: 'German' },
-    { code: 'ES', name: 'Spanish' }
-];
-
-const subjects = [
-    { id: 1, name: 'Biology' },
-    { id: 2, name: 'Education and Training' },
-    { id: 3, name: 'Software Engineering' },
-    { id: 4, name: 'Computer Engineering' },
-    { id: 5, name: 'Turkish Language and Literature' },
-    { id: 6, name: 'Religion Studies' }
-];
-
-const keywords = [
-    { id: 1, text: 'Evolution' },
-    { id: 2, text: 'Religion' },
-    { id: 3, text: 'Software' },
-    { id: 4, text: 'Educational Technology' },
-    { id: 5, text: 'Tourism' },
-    { id: 6, text: 'Algorithm Design' }
-];
-
-const theses = [
-    {
-        id: 894096,
-        title: "Young adults' attitudes towards evolutionary theory and religiosity",
-        abstract: "This thesis investigates the relationship between young adults' attitudes towards evolution, religious identity and perceived conflict between science and religion.",
-        author_id: 1,
-        year: 2024,
-        type_id: 2,
-        institute_id: 1,
-        page_count: 210,
-        language_code: 'TR',
-        submission_date: '2024-06-15',
-        supervisor_id: 4,
-        subjects: [5], // Religion Studies (Mapped from SQL)
-        keywords: [1, 2] // Evolution, Religion
-    },
-    {
-        id: 518265,
-        title: "Prospective biology teachers' knowledge of evolution and teaching self-efficacy",
-        abstract: "A descriptive study on Turkish prospective biology teachers' knowledge of evolution, acceptance of evolutionary theory and self-efficacy beliefs.",
-        author_id: 2,
-        year: 2018,
-        type_id: 1,
-        institute_id: 3,
-        page_count: 165,
-        language_code: 'TR',
-        submission_date: '2018-07-02',
-        supervisor_id: 5,
-        subjects: [1], // Biology
-        keywords: [1] // Evolution (Mapped from SQL) 
-    },
-    {
-        id: 958258,
-        title: "Evolving bodies and imperial imaginaries in contemporary literature",
-        abstract: "An analysis of bodily transformation, identity and power in selected contemporary novels using evolution as a metaphor.",
-        author_id: 1,
-        year: 2025,
-        type_id: 1,
-        institute_id: 5,
-        page_count: 190,
-        language_code: 'EN',
-        submission_date: '2025-05-20',
-        supervisor_id: 4,
-        subjects: [4], // Computer Engineering ?? (Wait, mapping from SQL insert says (4, 958258). Subject 4 is Computer Engineering. Title sounds like Lit. Let's trust the SQL provided.)
-        keywords: [4] // Educational Tech? (SQL says (4, 958258), keyword 4 is Educational Technology. )
-    },
-    {
-        id: 821884,
-        title: "A metric for tracking evolutionary coupling in complex software systems",
-        abstract: "This thesis proposes a new index for tracking evolutionary coupling between software modules using large-scale repository data.",
-        author_id: 2,
-        year: 2023,
-        type_id: 1,
-        institute_id: 4,
-        page_count: 145,
-        language_code: 'EN',
-        submission_date: '2023-09-10',
-        supervisor_id: 5,
-        subjects: [3], // Software Engineering
-        keywords: [5] // Tourism ?? (SQL says (5, 821884). Keyword 5 is Tourism. This is odd for a SW thesis but I follow the data.)
-    },
-    {
-        id: 952012,
-        title: "Evolution of language: cognitive and social perspectives",
-        abstract: "A comparative study on the evolution of human language abilities from cognitive and sociocultural viewpoints.",
-        author_id: 1,
-        year: 2025,
-        type_id: 2,
-        institute_id: 2,
-        page_count: 250,
-        language_code: 'TR',
-        submission_date: '2025-10-01',
-        supervisor_id: 4,
-        subjects: [2],
+// --- State Management ---
+let state = {
+    metadata: {
+        universities: [],
+        institutes: [],
+        thesisTypes: [],
+        languages: [],
+        subjects: [],
         keywords: []
     },
-    // --- Added 15 New Mock Theses for Visual Testing ---
-    { id: 1001, title: "Deep Learning in Medical Imaging", abstract: "Using CNNs for early detection of lung cancer nodules.", author_id: 1, year: 2023, type_id: 1, institute_id: 1, page_count: 120, language_code: 'EN', submission_date: '2023-01-15', supervisor_id: 4, subjects: [4], keywords: [3] },
-    { id: 1002, title: "Turkish Folk Literature in the 19th Century", abstract: "An analysis of folk tales and their cultural impact during the late Ottoman period.", author_id: 2, year: 2020, type_id: 2, institute_id: 5, page_count: 300, language_code: 'TR', submission_date: '2020-05-20', supervisor_id: 5, subjects: [5], keywords: [] },
-    { id: 1003, title: "Quantum Computing Algorithms", abstract: "Exploring the efficiency of Shor's algorithm in modern simulations.", author_id: 1, year: 2024, type_id: 1, institute_id: 4, page_count: 150, language_code: 'EN', submission_date: '2024-03-10', supervisor_id: 4, subjects: [4], keywords: [6] },
-    { id: 1004, title: "Urban Planning and Sustainability", abstract: "Eco-friendly architectural designs for growing metropolitan areas.", author_id: 2, year: 2022, type_id: 1, institute_id: 3, page_count: 180, language_code: 'TR', submission_date: '2022-11-05', supervisor_id: 5, subjects: [2], keywords: [5] },
-    { id: 1005, title: "The Psychology of Remote Work", abstract: "Impact of long-term isolation on employee productivity and mental health.", author_id: 1, year: 2021, type_id: 1, institute_id: 7, page_count: 135, language_code: 'EN', submission_date: '2021-08-12', supervisor_id: 4, subjects: [2], keywords: [] },
-    { id: 1006, title: "Artificial Intelligence in Education", abstract: "Adaptive learning systems for personalized high school education.", author_id: 2, year: 2024, type_id: 2, institute_id: 5, page_count: 260, language_code: 'TR', submission_date: '2024-02-28', supervisor_id: 5, subjects: [2, 3], keywords: [3, 4] },
-    { id: 1007, title: "Modern Art Movements in Turkey", abstract: "A review of abstract impressionism in the early 2000s.", author_id: 1, year: 2019, type_id: 4, institute_id: 2, page_count: 140, language_code: 'TR', submission_date: '2019-06-30', supervisor_id: 4, subjects: [6], keywords: [] },
-    { id: 1008, title: "Blockchain for Supply Chain", abstract: "Implementing decentralized ledgers for transparent logistics.", author_id: 2, year: 2023, type_id: 1, institute_id: 4, page_count: 110, language_code: 'EN', submission_date: '2023-12-01', supervisor_id: 5, subjects: [3], keywords: [3] },
-    { id: 1009, title: "Genetic Markers in Wheat Production", abstract: "Increasing yield through selective breeding and CRISPR technology.", author_id: 1, year: 2022, type_id: 2, institute_id: 1, page_count: 320, language_code: 'EN', submission_date: '2022-04-14', supervisor_id: 4, subjects: [1], keywords: [1] },
-    { id: 1010, title: "Cybersecurity in IoT Devices", abstract: "Vulnerability assessment of smart home appliances.", author_id: 2, year: 2025, type_id: 1, institute_id: 6, page_count: 175, language_code: 'EN', submission_date: '2025-01-20', supervisor_id: 5, subjects: [3, 4], keywords: [3] },
-    { id: 1011, title: "Ottoman Economic Policy 1700-1800", abstract: "Taxation and trade routes in the 18th century empire.", author_id: 1, year: 2018, type_id: 2, institute_id: 7, page_count: 400, language_code: 'TR', submission_date: '2018-09-09', supervisor_id: 4, subjects: [5], keywords: [] },
-    { id: 1012, title: "Machine Translation Accuracy", abstract: "Comparing neural machine translation models for Turkic languages.", author_id: 2, year: 2023, type_id: 1, institute_id: 4, page_count: 130, language_code: 'EN', submission_date: '2023-07-22', supervisor_id: 5, subjects: [3], keywords: [3] },
-    { id: 1013, title: "Renewable Energy Grid Integration", abstract: "Challenges in stabilizing grids with high solar penetration.", author_id: 1, year: 2021, type_id: 2, institute_id: 3, page_count: 220, language_code: 'TR', submission_date: '2021-03-15', supervisor_id: 4, subjects: [1], keywords: [] },
-    { id: 1014, title: "AR in Museum Exhibits", abstract: "Enhancing visitor engagement through Augmented Reality.", author_id: 2, year: 2024, type_id: 4, institute_id: 2, page_count: 160, language_code: 'EN', submission_date: '2024-11-11', supervisor_id: 5, subjects: [2], keywords: [4] },
-    { id: 1015, title: "Micro-plastics in Mediterranean Sea", abstract: "Quantitative analysis of pollution levels in coastal regions.", author_id: 1, year: 2022, type_id: 1, institute_id: 1, page_count: 195, language_code: 'EN', submission_date: '2022-08-30', supervisor_id: 4, subjects: [1], keywords: [] }
-];
+    currentUser: null,
+    currentView: 'login', // login, home, search, submit, detail, my-theses
+    theses: [] // Cache for search results
+};
+
+// --- Initialization ---
+async function initApp() {
+    initCanvas();
+    
+    // Check for existing token
+    const token = localStorage.getItem('access_token');
+    const userJson = localStorage.getItem('user');
+    
+    if (token && userJson) {
+        state.currentUser = JSON.parse(userJson);
+        state.currentView = 'home';
+    }
+
+    // Fetch Metadata
+    try {
+        const res = await fetch(`${API_URL}/metadata`);
+        if (res.ok) {
+            state.metadata = await res.json();
+        } else {
+            console.error('Failed to load metadata');
+        }
+    } catch (e) {
+        console.error('API Error:', e);
+    }
+
+    render();
+}
+
+// Start
+initApp();
 
 
 // --- State Management ---
 
-let currentUser = null; // null = not logged in
-let currentView = 'login'; // login, search, submit, detail
+// --- REPLACED BY STATE OBJECT ABOVE ---
 
 // --- Helper Functions ---
 
-function getAuthorName(id) {
-    const user = users.find(u => u.id === id);
-    return user ? `${user.first_name} ${user.last_name}` : 'Unknown';
-}
+// function getAuthorName(id) { ... } // Replaced by direct property access from API response for theses
+// function getAuthorName(id) { return 'Unknown'; } // Deprecated: Use thesis.author string from API
+
 
 function getTypeName(id) {
-    const type = thesisTypes.find(t => t.id === id);
+    const type = state.metadata.thesisTypes.find(t => t.id === id);
     return type ? type.name : 'Unknown';
 }
 
 function getInstituteName(id) {
-    const inst = institutes.find(i => i.id === id);
+    const inst = state.metadata.institutes.find(i => i.id === id);
     return inst ? inst.name : 'Unknown';
 }
 
 function getLanguageName(code) {
-    const lang = languages.find(l => l.code === code);
+    const lang = state.metadata.languages.find(l => l.code === code);
     return lang ? lang.name : code;
 }
 
 function getUniversityName(instituteId) {
-    const inst = institutes.find(i => i.id === instituteId);
+    const inst = state.metadata.institutes.find(i => i.id === instituteId);
     if (!inst) return 'Unknown University';
-    const uni = universities.find(u => u.id === inst.university_id);
+    const uni = state.metadata.universities.find(u => u.id === inst.university_id);
     return uni ? uni.name : 'Unknown University';
 }
 
@@ -377,10 +260,10 @@ function render() {
     // Toggle Background Canvas Logic
     const bgCanvas = document.getElementById('bg-canvas');
     if (bgCanvas) {
-        if (currentView === 'login') {
+        if (state.currentView === 'login') {
             bgCanvas.style.display = 'block';
             if (window.resetCanvasState) window.resetCanvasState('particles');
-        } else if (currentView === 'home') {
+        } else if (state.currentView === 'home') {
             bgCanvas.style.display = 'block';
             if (window.resetCanvasState) window.resetCanvasState('dots');
         } else {
@@ -392,29 +275,29 @@ function render() {
     }
 
     // Toggle Mesh Background for Submit View, Search View, AND My Theses View
-    if (currentView === 'submit' || currentView === 'search' || currentView === 'my-theses') {
+    if (state.currentView === 'submit' || state.currentView === 'search' || state.currentView === 'my-theses') {
         document.body.classList.add('mesh-bg');
     } else {
         document.body.classList.remove('mesh-bg');
     }
 
     // Protected Views check
-    if (!currentUser && currentView !== 'login') {
-        currentView = 'login';
+    if (!state.currentUser && state.currentView !== 'login') {
+        state.currentView = 'login';
     }
 
-    if (currentView === 'login') {
+    if (state.currentView === 'login') {
         renderLogin();
     } else {
         renderHeader();
-        if (currentView === 'home') renderHome();
-        else if (currentView === 'search') renderSearch();
-        else if (currentView === 'submit') renderSubmit();
-        else if (currentView === 'my-theses') renderMyTheses();
-        else if (currentView === 'admin') renderAdmin();
-        else if (currentView === 'supervisor') renderSupervisorPanel();
-        else if (currentView.startsWith('detail-')) {
-            const id = parseInt(currentView.split('-')[1]);
+        if (state.currentView === 'home') renderHome();
+        else if (state.currentView === 'search') renderSearch();
+        else if (state.currentView === 'submit') renderSubmit();
+        else if (state.currentView === 'my-theses') renderMyTheses();
+        else if (state.currentView === 'admin') renderAdmin();
+        else if (state.currentView === 'supervisor') renderSupervisorPanel();
+        else if (state.currentView.startsWith('detail-')) {
+            const id = parseInt(state.currentView.split('-')[1]);
             renderDetail(id);
         }
     }
@@ -425,7 +308,7 @@ function renderHome() {
     section.className = 'home-section fade-in';
     section.innerHTML = `
         <div class="home-hero">
-            <h1>Welcome back, ${currentUser.first_name}</h1>
+            <h1>Welcome back, ${state.currentUser.first_name}</h1>
             <p>What would you like to do today?</p>
         </div>
         <div class="home-actions">
@@ -545,38 +428,84 @@ function renderLogin() {
         title.innerText = 'GTS Login';
     });
 
-    loginForm.addEventListener('submit', (e) => {
+    loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('login-email').value.trim();
-        currentUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-
-        if (currentUser) {
-            currentView = 'home'; // Redirect to Home!
-            renderHeader();
-            render();
-        } else {
-            alert('Invalid email! Try: volkan.tunali@gmail.com');
+        const password = document.getElementById('login-password').value.trim();
+        
+        try {
+            const res = await fetch(`${API_URL}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            
+            if (res.ok) {
+                const data = await res.json();
+                localStorage.setItem('access_token', data.access_token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                state.currentUser = data.user;
+                
+                state.currentView = 'home';
+                renderHeader();
+                render();
+            } else {
+                const err = await res.json();
+                alert(err.error || 'Login failed');
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Login error');
         }
     });
 
-    registerForm.addEventListener('submit', (e) => {
-        // ... same reg logic ...
+    registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const name = document.getElementById('reg-name').value.trim();
+        const fullName = document.getElementById('reg-name').value.trim();
         const email = document.getElementById('reg-email').value.trim();
-        // ... (simplified check) ...
-        const newUser = { id: users.length + 999, first_name: name.split(' ')[0], last_name: name.split(' ')[1] || '', role_id: 1, email: email };
-        users.push(newUser);
-        currentUser = newUser;
-        currentView = 'home';
-        renderHeader();
-        render();
+        const password = document.getElementById('reg-password').value.trim();
+        
+        // Split Name
+        const parts = fullName.split(' ');
+        const firstName = parts[0];
+        const lastName = parts.slice(1).join(' ') || '';
+
+        try {
+            const res = await fetch(`${API_URL}/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    first_name: firstName, 
+                    last_name: lastName,
+                    email: email,
+                    password: password
+                })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                localStorage.setItem('access_token', data.access_token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                state.currentUser = data.user;
+                
+                state.currentView = 'home';
+                renderHeader();
+                render();
+            } else {
+                const err = await res.json();
+                alert(err.error || 'Registration failed');
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Registration error');
+        }
     });
 }
 
 // Init
-initCanvas();
-render();
+// Init handled by initApp()
+// initCanvas();
+// render();
 
 function renderHeader() {
     // This function updates the header area outside the appContainer if needed, 
@@ -588,11 +517,11 @@ function renderHeader() {
 
     nav.innerHTML = ''; // Clear existing content
 
-    if (!currentUser) return; // Empty nav if logged out
+    if (!state.currentUser) return; // Empty nav if logged out
 
     // Check if Admin
-    const isAdmin = currentUser.role_id === 2;
-    const isSupervisor = currentUser.role_id === 3;
+    const isAdmin = state.currentUser.role_id === 2;
+    const isSupervisor = state.currentUser.role_id === 3;
 
     let panelBtn = '';
     if (isAdmin) {
@@ -623,22 +552,25 @@ function renderHeader() {
         ${panelBtn}
         <button onclick="logout()">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-            Logout (${currentUser.first_name})
+            Logout (${state.currentUser.first_name})
         </button>
     `;
     // We do NOT append child to header, as 'nav' is already in place.
 }
 
 window.switchView = (view) => {
-    currentView = view;
+    state.currentView = view;
     render();
 };
 
 window.logout = () => {
-    currentUser = null;
-    currentView = 'login';
+    state.currentUser = null;
+    state.currentView = 'login';
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('user');
+    
     const nav = document.getElementById('main-nav');
-    if (nav) nav.innerHTML = ''; // Clear content, don't remove element
+    if (nav) nav.innerHTML = ''; 
     render();
 };
 
@@ -647,7 +579,7 @@ function renderSearch() {
     section.className = 'search-container fade-in';
 
     // Sort keywords alphabetically for better UX
-    const sortedKeywords = [...keywords].sort((a, b) => a.text.localeCompare(b.text));
+    const sortedKeywords = [...state.metadata.keywords].sort((a, b) => a.text.localeCompare(b.text));
 
     section.innerHTML = `
         <div class="filters-card">
@@ -667,7 +599,7 @@ function renderSearch() {
                  <div class="select-wrapper">
                      <select id="filter-type">
                         <option value="">All Types</option>
-                        ${thesisTypes.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
+                        ${state.metadata.thesisTypes.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
                     </select>
                  </div>
                 <div class="year-group">
@@ -682,31 +614,31 @@ function renderSearch() {
                 <span>&#9656;</span> Show Advanced Filters
             </button>
 
-            <!-- Advanced Filters Area (Hidden by default) -->
+            <!-- Advanced Filters Area -->
             <div id="advanced-filters" style="display:none; padding-top:1rem; border-top:1px solid var(--border);">
                 <div class="filter-grid">
                     <select id="filter-university">
                         <option value="">All Universities</option>
-                        ${universities.map(u => `<option value="${u.id}">${u.name}</option>`).join('')}
+                        ${state.metadata.universities.map(u => `<option value="${u.id}">${u.name}</option>`).join('')}
                     </select>
                     <select id="filter-institute">
                         <option value="">All Institutes</option>
-                        ${institutes.map(i => `<option value="${i.id}">${i.name} (${getUniversityName(i.id)})</option>`).join('')}
+                        ${state.metadata.institutes.map(i => `<option value="${i.id}">${i.name} (${getUniversityName(i.id)})</option>`).join('')}
                     </select>
                     <select id="filter-language">
                         <option value="">All Languages</option>
-                        ${languages.map(l => `<option value="${l.code}">${l.name}</option>`).join('')}
+                        ${state.metadata.languages.map(l => `<option value="${l.code}">${l.name}</option>`).join('')}
                     </select>
                     <select id="filter-subject">
                         <option value="">All Subjects</option>
-                        ${subjects.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
+                        ${state.metadata.subjects.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
                     </select>
                     
                     <!-- Keyword Autocomplete Filter -->
                     <div style="flex:1; min-width:150px;">
                         <input type="text" id="filter-keyword" list="keyword-list" placeholder="Filter by Keyword (e.g. Evolution)">
                         <datalist id="keyword-list">
-                            ${sortedKeywords.map(k => `<option value="${k.text}">`).join('')}
+                            ${state.metadata.keywords.sort((a,b)=>a.text.localeCompare(b.text)).map(k => `<option value="${k.text}">`).join('')}
                         </datalist>
                     </div>
                 </div>
@@ -740,118 +672,126 @@ function renderSearch() {
     document.getElementById('filter-university').addEventListener('change', filterAndRenderResults);
 }
 
-function filterAndRenderResults() {
-    const query = document.getElementById('search-text')?.value.toLowerCase() || '';
+async function filterAndRenderResults() {
+    const query = document.getElementById('search-text')?.value || '';
     const typeId = document.getElementById('filter-type')?.value;
     const langCode = document.getElementById('filter-language')?.value;
     const instId = document.getElementById('filter-institute')?.value;
     const uniId = document.getElementById('filter-university')?.value;
     const subjId = document.getElementById('filter-subject')?.value;
-
-    // Keyword Filter Logic
-    const keywordInput = document.getElementById('filter-keyword')?.value;
-    // Find the ID of the keyword if it exists in our list (Case insensitive match)
-    const targetKeyword = keywordInput ? keywords.find(k => k.text.toLowerCase() === keywordInput.toLowerCase()) : null;
-
-
+    const keywordText = document.getElementById('filter-keyword')?.value;
     const minYear = document.getElementById('filter-year-min')?.value;
     const maxYear = document.getElementById('filter-year-max')?.value;
 
-    const filtered = theses.filter(t => {
-        // Text Search
-        const titleMatch = t.title.toLowerCase().includes(query);
-        const abstractMatch = t.abstract.toLowerCase().includes(query);
-        const authorName = getAuthorName(t.author_id).toLowerCase();
-        const authorMatch = authorName.includes(query);
-        // We still search keywords in the main text search too
-        const thesisKeywords = t.keywords ? t.keywords.map(kId => keywords.find(k => k.id === kId)?.text.toLowerCase()).join(' ') : '';
-        const keywordTextMatch = thesisKeywords.includes(query);
+    // Build Query Params
+    const params = new URLSearchParams();
+    if (query) params.append('q', query);
+    if (typeId) params.append('type', typeId);
+    if (langCode) params.append('language', langCode);
+    if (instId) params.append('institute', instId);
+    if (uniId) params.append('university', uniId);
+    if (subjId) params.append('subject', subjId);
+    if (minYear) params.append('year_min', minYear);
+    if (maxYear) params.append('year_max', maxYear);
+    
+    if (keywordText) {
+        const kw = state.metadata.keywords.find(k => k.text.toLowerCase() === keywordText.toLowerCase());
+        if (kw) params.append('keyword_id', kw.id);
+    }
 
-        const textMatch = titleMatch || abstractMatch || authorMatch || keywordTextMatch;
+    try {
+        const res = await fetch(`${API_URL}/theses?${params.toString()}`);
+        if (!res.ok) throw new Error('Search failed');
+        const results = await res.json();
+        state.theses = results; // Cache
+        renderResults(results);
+    } catch (e) {
+        console.error(e);
+        document.getElementById('results-area').innerHTML = `<p class="no-results">Error loading results.</p>`;
+    }
+}
 
-        // Exact filters
-        const typeMatch = typeId ? t.type_id == typeId : true;
-        const langMatch = langCode ? t.language_code === langCode : true;
-        const instMatch = instId ? t.institute_id == instId : true;
-        const subjMatch = subjId ? (t.subjects && t.subjects.includes(parseInt(subjId))) : true;
+function renderResults(list) {
+    const area = document.getElementById('results-area');
+    if (!area) return;
+    area.innerHTML = '';
 
-        // University Filter
-        let uniMatch = true;
-        if (uniId) {
-            // Find institute of this thesis
-            const thesisInst = institutes.find(i => i.id === t.institute_id);
-            // Check if that institute belongs to selected university matches
-            uniMatch = thesisInst && thesisInst.university_id == uniId;
-        }
-
-        // Specific Keyword Filter (Advanced)
-        let kwFilterMatch = true;
-        if (keywordInput) {
-            if (targetKeyword) {
-                kwFilterMatch = t.keywords && t.keywords.includes(targetKeyword.id);
-            } else {
-                kwFilterMatch = t.keywords && t.keywords.some(kid => {
-                    const kText = keywords.find(k => k.id === kid)?.text.toLowerCase();
-                    return kText && kText.includes(keywordInput.toLowerCase());
-                });
-            }
-        }
-
-        // Year Range
-        const yearMinMatch = minYear ? t.year >= minYear : true;
-        const yearMaxMatch = maxYear ? t.year <= maxYear : true;
-
-        return textMatch && typeMatch && langMatch && instMatch && uniMatch && subjMatch && kwFilterMatch && yearMinMatch && yearMaxMatch;
-    });
-
-    const resultsArea = document.getElementById('results-area');
-    resultsArea.innerHTML = '';
-
-    if (filtered.length === 0) {
-        resultsArea.innerHTML = '<p class="no-results">No theses found matching criteria.</p>';
+    if (list.length === 0) {
+        area.innerHTML = `
+            <div class="no-results">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <p>No theses found matching your criteria.</p>
+            </div>
+        `;
         return;
     }
 
-    filtered.forEach(t => {
+    list.forEach(t => {
         const card = document.createElement('div');
-        // Use 'glass-card' for Liquid Glass effect in Search too
-        card.className = 'thesis-card glass-card';
+        card.className = 'thesis-card glass-card fade-in';
+        
+        const thesisSubjects = t.subjects.map(sId => {
+            const s = state.metadata.subjects.find(sub => sub.id === sId);
+            return s ? `<span class="tag subject-tag">${s.name}</span>` : '';
+        }).join('');
+
+        const thesisKeywords = t.keywords.map(kId => {
+            const k = state.metadata.keywords.find(kw => kw.id === kId);
+            return k ? `<span class="tag keyword-tag">#${k.text}</span>` : '';
+        }).join('');
+
         card.innerHTML = `
             <div class="card-header">
                 <span class="badge type">${getTypeName(t.type_id)}</span>
                 <span class="badge lang">${t.language_code}</span>
             </div>
             <h3 onclick="switchView('detail-${t.id}')">${t.title}</h3>
-            <p class="author">by ${getAuthorName(t.author_id)}</p>
-            <p class="uni">${getUniversityName(t.institute_id)}</p>
+            <div class="thesis-meta">
+                <span class="author">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    ${t.author || 'Unknown'}
+                </span>
+                <span class="uni">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.9 10.7a1.67 1.67 0 0 0 .58-1 1.67 1.67 0 0 0-.58-1l-9-5a1.8 1.8 0 0 0-1.8 0l-9 5a1.67 1.67 0 0 0-.58 1 1.67 1.67 0 0 0 .58 1l9 5a1.8 1.8 0 0 0 1.8 0z"/><path d="M12 21.5V16"/></svg>
+                    ${getUniversityName(t.institute_id)}
+                </span>
+            </div>
+            <p class="thesis-abstract">${t.abstract ? t.abstract.substring(0, 120) + '...' : ''}</p>
             <div class="card-footer">
-                <span>${t.year}</span>
+                <span class="thesis-year">${t.year}</span>
                 <button onclick="switchView('detail-${t.id}')" class="btn-text">View Details &rarr;</button>
             </div>
         `;
-        resultsArea.appendChild(card);
+        area.appendChild(card);
     });
 }
 
 function renderDetail(id) {
-    const thesis = theses.find(t => t.id === id);
-    if (!thesis) return switchView('search');
+    const thesis = state.theses.find(t => t.id === id);
+    if (!thesis) {
+        alert("Thesis details not found in cache. Please search again.");
+        return switchView('search');
+    }
 
     const section = document.createElement('section');
     section.className = 'detail-view fade-in';
 
-    // Get related names
-    const subjectsList = thesis.subjects ? thesis.subjects.map(sid => subjects.find(s => s.id === sid)?.name).join(', ') : 'None';
-    const keywordsList = thesis.keywords ? thesis.keywords.map(kid => keywords.find(k => k.id === kid)?.text).join(', ') : 'None';
-    const supervisor = users.find(u => u.id === thesis.supervisor_id);
-    const supervisorName = supervisor ? `${supervisor.first_name} ${supervisor.last_name}` : 'Unknown';
+    // Get related names (using state.metadata)
+    const subjectsList = thesis.subjects ? thesis.subjects.map(sid => state.metadata.subjects.find(s => s.id === sid)?.name).join(', ') : 'None';
+    const keywordsList = thesis.keywords ? thesis.keywords.map(kid => state.metadata.keywords.find(k => k.id === kid)?.text).join(', ') : 'None';
+    
+    // Supervisor Name: API only returns IDs in supervisor_ids list.
+    // We don't have list of all users to lookup supervisor name by ID.
+    // For now, show "Supervisor ID: ..." or just "Unknown" if not in meta.
+    // Or we could have included it in API. Let's show IDs for now or Generic.
+    const supervisorName = thesis.supervisor_ids && thesis.supervisor_ids.length > 0 ? `ID: ${thesis.supervisor_ids.join(', ')}` : 'None';
 
     section.innerHTML = `
         <button onclick="switchView('search')" class="btn-back">&larr; Back to Search</button>
         <div class="detail-card">
             <h1>${thesis.title}</h1>
             <div class="meta-row">
-                <span class="meta-item"><strong>Author:</strong> ${getAuthorName(thesis.author_id)}</span>
+                <span class="meta-item"><strong>Author:</strong> ${thesis.author || 'Unknown'}</span>
                 <span class="meta-item"><strong>Year:</strong> ${thesis.year}</span>
                 <span class="meta-item"><strong>Language:</strong> ${getLanguageName(thesis.language_code)}</span>
                 <span class="meta-item"><strong>Pages:</strong> ${thesis.page_count}</span>
@@ -877,47 +817,85 @@ function renderDetail(id) {
     appContainer.appendChild(section);
 }
 
-function renderMyTheses() {
+async function renderMyTheses() {
     const section = document.createElement('section');
     section.className = 'my-theses-section fade-in';
     section.innerHTML = `
         <div class="filters-card glass-panel" style="text-align: center; border:none; background:rgba(255,255,255,0.1); backdrop-filter:blur(10px);">
              <h3 style="color:var(--text-primary);">My Theses</h3>
-             <p style="color:var(--text-secondary);">Theses you have submitted to the system</p>
+             <p style="color:var(--text-secondary);">Theses you have submitted</p>
         </div>
         <div id="my-results-area" class="results-grid">
-            <!-- Properties will be filled here -->
+            <p style="text-align:center; grid-column:1/-1;">Loading...</p>
         </div>
     `;
     appContainer.appendChild(section);
 
-    const myTheses = theses.filter(t => t.author_id === currentUser.id);
-    const resultsArea = document.getElementById('my-results-area');
-
-    if (myTheses.length === 0) {
-        resultsArea.innerHTML = '<p class="no-results" style="grid-column: 1/-1; text-align:center;">You haven\'t submitted any theses yet.</p>';
+    const token = localStorage.getItem('access_token');
+    // Check for null, undefined, or string "undefined"/"null"
+    if (!token || token === 'undefined' || token === 'null') {
+        alert("You must be logged in to view this page.");
+        logout();
         return;
     }
 
-    myTheses.forEach(t => {
-        const card = document.createElement('div');
-        // Use 'glass-card' for specific styling
-        card.className = 'thesis-card glass-card';
-        card.innerHTML = `
-            <div class="card-header">
-                <span class="badge type">${getTypeName(t.type_id)}</span>
-                <span class="badge lang">${t.language_code}</span>
-            </div>
-            <h3 onclick="switchView('detail-${t.id}')">${t.title}</h3>
-            <p class="author">by Me (${getAuthorName(t.author_id)})</p>
-            <p class="uni">${getUniversityName(t.institute_id)}</p>
-            <div class="card-footer">
-                <span>${t.year}</span>
-                <button onclick="switchView('detail-${t.id}')" class="btn-text">View Details &rarr;</button>
-            </div>
-        `;
-        resultsArea.appendChild(card);
-    });
+    try {
+        const res = await fetch(`${API_URL}/my-theses`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (res.status === 401 || res.status === 422) {
+            alert("Session expired. Please login again.");
+            logout();
+            return;
+        }
+
+        const myTheses = await res.json();
+        
+        const resultsArea = document.getElementById('my-results-area');
+        resultsArea.innerHTML = '';
+        
+        if (myTheses.length === 0) {
+            resultsArea.innerHTML = '<p class="no-results" style="grid-column: 1/-1; text-align:center;">You haven\'t submitted any theses yet.</p>';
+            return;
+        }
+
+        // Add to cache so details work
+        // Merge with existing cache to avoid losing search results? Or just push?
+        // Simple approach: append unique
+        myTheses.forEach(t => {
+            if (!state.theses.find(existing => existing.id === t.id)) {
+                state.theses.push(t);
+            }
+        });
+
+        // Use renderResults logic or inline? Inline simpler for now to match style
+        myTheses.forEach(t => {
+            const card = document.createElement('div');
+            card.className = 'thesis-card glass-card';
+            card.innerHTML = `
+                <div class="card-header">
+                     <!-- API /my-theses might not return everything needed for type name if not joined. 
+                          Check app.py: get_my_theses returns subset! 
+                          I should update app.py to return full thesis object for consistency. 
+                          Assuming I updated app.py logic logic below to return standard response. -->
+                     <span class="badge type">${t.type_id ? getTypeName(t.type_id) : 'Thesis'}</span>
+                     <span class="badge lang">${t.language_code || 'TR'}</span>
+                </div>
+                <h3 onclick="switchView('detail-${t.id}')">${t.title}</h3>
+                <p class="author">by Me</p>
+                <div class="card-footer">
+                    <span>${t.year || ''}</span>
+                    <button onclick="switchView('detail-${t.id}')" class="btn-text">View Details &rarr;</button>
+                </div>
+            `;
+            resultsArea.appendChild(card);
+        });
+
+    } catch(e) {
+        console.error(e);
+        document.getElementById('my-results-area').innerHTML = '<p>Error loading your theses.</p>';
+    }
 }
 
 function renderSupervisorPanel() {
@@ -940,11 +918,13 @@ function renderSupervisorPanel() {
     appContainer.appendChild(section);
 
     // Filter theses where supervisor_id matches current User ID
-    const assignedTheses = theses.filter(t => t.supervisor_id === currentUser.id);
+    // Note: This relies on state.theses being populated. If we just logged in, it's empty.
+    // For now, this panel is best effort.
+    const assignedTheses = state.theses.filter(t => t.supervisor_ids && t.supervisor_ids.includes(state.currentUser.id));
     const resultsArea = document.getElementById('sup-results-area');
 
     if (assignedTheses.length === 0) {
-        resultsArea.innerHTML = '<p class="no-results" style="grid-column: 1/-1; text-align:center;">No theses assigned to you yet.</p>';
+        resultsArea.innerHTML = '<p class="no-results" style="grid-column: 1/-1; text-align:center;">No theses found in cache assigned to you. (Search first to populate cache)</p>';
         return;
     }
 
@@ -957,7 +937,7 @@ function renderSupervisorPanel() {
                 <span class="badge lang">${t.language_code}</span>
             </div>
             <h3 onclick="switchView('detail-${t.id}')">${t.title}</h3>
-            <p class="author">Author: ${getAuthorName(t.author_id)}</p>
+            <p class="author">Author: ${t.author || 'Unknown'}</p>
             <p class="uni">${getUniversityName(t.institute_id)}</p>
             <div class="card-footer">
                 <span>${t.year}</span>
@@ -971,10 +951,10 @@ function renderSupervisorPanel() {
 // Global delete function
 window.deleteThesis = (id) => {
     if (confirm('Are you sure you want to delete this thesis? This action cannot be undone.')) {
-        const index = theses.findIndex(t => t.id === id);
+        const index = state.theses.findIndex(t => t.id === id);
         if (index > -1) {
-            theses.splice(index, 1);
-            alert('Thesis deleted successfully.');
+            state.theses.splice(index, 1);
+            alert('Thesis deleted locally (Backend delete not impl).');
             renderSupervisorPanel(); // Re-render
         }
     }
@@ -1008,20 +988,20 @@ function renderSubmit() {
                  <div class="form-group">
                     <label>Type</label>
                     <select id="sub-type">
-                        ${thesisTypes.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
+                        ${state.metadata.thesisTypes.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
                     </select>
                 </div>
                 <div class="form-group">
                     <label>Language</label>
                     <select id="sub-lang">
-                         ${languages.map(l => `<option value="${l.code}">${l.name}</option>`).join('')}
+                         ${state.metadata.languages.map(l => `<option value="${l.code}">${l.name}</option>`).join('')}
                     </select>
                 </div>
             </div>
             <div class="form-group full">
                 <label>Institute</label>
                 <select id="sub-inst">
-                     ${institutes.map(i => `<option value="${i.id}">${i.name} (${getUniversityName(i.id)})</option>`).join('')}
+                     ${state.metadata.institutes.map(i => `<option value="${i.id}">${i.name} (${getUniversityName(i.id)})</option>`).join('')}
                 </select>
             </div>
             
@@ -1029,7 +1009,7 @@ function renderSubmit() {
                  <div class="form-group">
                     <label>Subject</label>
                     <select id="sub-subject">
-                        ${subjects.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
+                        ${state.metadata.subjects.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
                     </select>
                 </div>
                 <div class="form-group" style="flex:2;"> <!-- Give keywords more space -->
@@ -1045,45 +1025,7 @@ function renderSubmit() {
 
     document.getElementById('submit-form').addEventListener('submit', (e) => {
         e.preventDefault();
-
-        // Process Keywords
-        const rawKeywords = document.getElementById('sub-keywords').value.split(',');
-        const keywordIds = rawKeywords.map(k => {
-            const text = k.trim();
-            if (!text) return null;
-            // Check existing
-            const existing = keywords.find(kw => kw.text.toLowerCase() === text.toLowerCase());
-            if (existing) return existing.id;
-            // Add new mock keyword
-            const newId = keywords.length > 0 ? Math.max(...keywords.map(k => k.id)) + 1 : 1;
-            keywords.push({ id: newId, text: text });
-            return newId;
-        }).filter(id => id !== null);
-
-        // Random Supervisor Assignment
-        // Get all users with role_id = 3 (Supervisor)
-        const supervisors = users.filter(u => u.role_id === 3);
-        const randomSupervisor = supervisors.length > 0 ? supervisors[Math.floor(Math.random() * supervisors.length)] : null;
-        const supervisorId = randomSupervisor ? randomSupervisor.id : 4; // Fallback
-
-        // Mock Submission logic
-        const newThesis = {
-            id: Math.floor(Math.random() * 900000) + 100000,
-            title: document.getElementById('sub-title').value,
-            abstract: document.getElementById('sub-abstract').value,
-            author_id: currentUser.id,
-            year: parseInt(document.getElementById('sub-year').value),
-            type_id: parseInt(document.getElementById('sub-type').value),
-            institute_id: parseInt(document.getElementById('sub-inst').value),
-            page_count: parseInt(document.getElementById('sub-pages').value),
-            language_code: document.getElementById('sub-lang').value,
-            submission_date: new Date().toISOString().split('T')[0],
-            supervisor_id: supervisorId,
-            subjects: [parseInt(document.getElementById('sub-subject').value)],
-            keywords: keywordIds
-        };
-        theses.push(newThesis);
-        alert(`Thesis submitted successfully! user: ${randomSupervisor ? randomSupervisor.first_name + ' ' + randomSupervisor.last_name : 'System'} assigned as Supervisor.`);
+        alert("Submission Mock: Backend Submission not implemented in this refactor phase.");
         switchView('search');
     });
 }
@@ -1105,7 +1047,7 @@ function renderAdmin() {
             <div class="admin-card">
                 <h3>Universities</h3>
                 <ul class="item-list">
-                    ${universities.map(u => `<li>${u.name}</li>`).join('')}
+                    ${state.metadata.universities.map(u => `<li>${u.name}</li>`).join('')}
                 </ul>
                 <form id="add-uni-form" class="admin-form-row">
                     <input type="text" id="new-uni-name" placeholder="New University Name" required>
@@ -1117,13 +1059,13 @@ function renderAdmin() {
             <div class="admin-card">
                 <h3>Institutes</h3>
                 <ul class="item-list">
-                    ${institutes.map(i => `<li>${i.name} <span>(${getUniversityName(i.university_id)})</span></li>`).join('')}
+                    ${state.metadata.institutes.map(i => `<li>${i.name} <span>(${getUniversityName(i.university_id)})</span></li>`).join('')}
                 </ul>
                 <form id="add-inst-form" class="admin-form-col">
                     <input type="text" id="new-inst-name" placeholder="New Institute Name" required>
                     <select id="new-inst-uni" required>
                         <option value="">Select University</option>
-                        ${universities.map(u => `<option value="${u.id}">${u.name}</option>`).join('')}
+                        ${state.metadata.universities.map(u => `<option value="${u.id}">${u.name}</option>`).join('')}
                     </select>
                     <button type="submit" class="btn-primary sm">Add Institute</button>
                 </form>
@@ -1137,8 +1079,8 @@ function renderAdmin() {
     document.getElementById('add-uni-form').addEventListener('submit', (e) => {
         e.preventDefault();
         const name = document.getElementById('new-uni-name').value;
-        const newId = universities.length + 1;
-        universities.push({ id: newId, name: name });
+        const newId = state.metadata.universities.length + 1;
+        state.metadata.universities.push({ id: newId, name: name });
         renderAdmin(); // Re-render to show new item
     });
 
@@ -1146,8 +1088,8 @@ function renderAdmin() {
         e.preventDefault();
         const name = document.getElementById('new-inst-name').value;
         const uniId = parseInt(document.getElementById('new-inst-uni').value);
-        const newId = institutes.length + 1;
-        institutes.push({ id: newId, name: name, university_id: uniId });
+        const newId = state.metadata.institutes.length + 1;
+        state.metadata.institutes.push({ id: newId, name: name, university_id: uniId });
         renderAdmin(); // Re-render
     });
 }
